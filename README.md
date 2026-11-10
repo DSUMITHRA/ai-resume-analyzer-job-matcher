@@ -50,6 +50,7 @@ Recruiters and job seekers often need to compare resumes with job requirements. 
 - Review matching scores and missing skills.
 
 ### 3. Dashboard
+![Dashboard](screenshots/dashboard.png)
 - View total resumes analyzed.
 - View available job descriptions.
 - Monitor average match score.
