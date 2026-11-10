@@ -45,6 +45,7 @@ Recruiters and job seekers often need to compare resumes with job requirements. 
 - View skill matching and text similarity results.
 
 ### 2. Analysis History
+![Analysis History](screenshots/history.png)
 - View previously analyzed resumes.
 - Check candidate names and job titles.
 - Review matching scores and missing skills.
