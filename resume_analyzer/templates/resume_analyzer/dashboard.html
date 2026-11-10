@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analyzer | Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f7fc;
+            color: #1e293b;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #111c35;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #60a5fa;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 9px 15px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #263956;
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1150px;
+            margin: 40px auto;
+            padding: 0 22px;
+        }
+
+        .heading {
+            margin-bottom: 30px;
+        }
+
+        .heading h1 {
+            color: #172554;
+            font-size: 30px;
+            margin-bottom: 9px;
+        }
+
+        .heading p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        /* Statistics Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 13px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.09);
+        }
+
+        .card-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1d4ed8;
+        }
+
+        .card:nth-child(2) .card-value {
+            color: #0891b2;
+        }
+
+        .card:nth-child(3) .card-value {
+            color: #7c3aed;
+        }
+
+        .card:nth-child(4) .card-value {
+            color: #16a34a;
+        }
+
+        .card-line {
+            height: 4px;
+            width: 45px;
+            border-radius: 10px;
+            background: #2563eb;
+            margin-top: 18px;
+        }
+
+        .card:nth-child(2) .card-line {
+            background: #0891b2;
+        }
+
+        .card:nth-child(3) .card-line {
+            background: #7c3aed;
+        }
+
+        .card:nth-child(4) .card-line {
+            background: #16a34a;
+        }
+
+        /* Recent Analysis Section */
+        .section {
+            background: white;
+            margin-top: 32px;
+            padding: 28px;
+            border-radius: 13px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+        }
+
+        .section-header {
+            margin-bottom: 22px;
+        }
+
+        .section-header h2 {
+            color: #172554;
+            font-size: 21px;
+            margin-bottom: 7px;
+        }
+
+        .section-header p {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .candidate {
+            color: #172554;
+            font-weight: 600;
+        }
+
+        .score {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .similarity {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        /* Error */
+        .error {
+            padding: 18px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #dc2626;
+            border-radius: 8px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 30px 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .navbar {
+                justify-content: center;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .container {
+                margin-top: 25px;
+                padding: 0 14px;
+            }
+
+            .heading h1 {
+                font-size: 25px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            AI <span>Resume Analyzer</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/history/">Analysis History</a>
+            <a href="/dashboard/" class="active">Dashboard</a>
+        </div>
+
+    </nav>
+
+    <!-- Main Dashboard -->
+    <div class="container">
+
+        <div class="heading">
+            <h1>Dashboard Overview</h1>
+            <p>Monitor resume analysis and job matching performance.</p>
+        </div>
+
+        {% if error %}
+
+            <p class="error">{{ error }}</p>
+
+        {% else %}
+
+            <!-- Statistics Cards -->
+            <div class="cards">
+
+                <div class="card">
+                    <p class="card-label">Total Resumes Analyzed</p>
+                    <p class="card-value">{{ total_resumes }}</p>
+                    <div class="card-line"></div>
+                </div>
+
+                <div class="card">
+                    <p class="card-label">Total Available Jobs</p>
+                    <p class="card-value">{{ total_jobs }}</p>
+                    <div class="card-line"></div>
+                </div>
+
+                <div class="card">
+                    <p class="card-label">Average Match Score</p>
+                    <p class="card-value">{{ average_score }}%</p>
+                    <div class="card-line"></div>
+                </div>
+
+                <div class="card">
+                    <p class="card-label">Highest Match Score</p>
+                    <p class="card-value">{{ highest_score }}%</p>
+                    <div class="card-line"></div>
+                </div>
+
+            </div>
+
+            <!-- Recent Analyses -->
+            <div class="section">
+
+                <div class="section-header">
+                    <h2>Recent Resume Analyses</h2>
+                    <p>Latest candidate resume matching results</p>
+                </div>
+
+                {% if recent_records %}
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Candidate Name</th>
+                                    <th>Job Title</th>
+                                    <th>Match Score</th>
+                                    <th>Similarity Score</th>
+                                    <th>Analysis Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for record in recent_records %}
+
+                                    <tr>
+                                        <td class="candidate">{{ record.0 }}</td>
+
+                                        <td>{{ record.1|default:"Unknown" }}</td>
+
+                                        <td class="score">{{ record.2 }}%</td>
+
+                                        <td class="similarity">{{ record.3 }}%</td>
+
+                                        <td>{{ record.4|date:"d-m-Y H:i" }}</td>
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <p class="empty">
+                        No resume analyses available yet.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <footer>
+        AI Resume Analyzer and Job Matcher | Built with Python, Django and Machine Learning
+    </footer>
+
+</body>
+</html>

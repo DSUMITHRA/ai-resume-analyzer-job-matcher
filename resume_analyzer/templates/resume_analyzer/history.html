@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analyzer | Analysis History</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f7fc;
+            color: #1e293b;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #111c35;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #60a5fa;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 9px 15px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #263956;
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1250px;
+            margin: 40px auto;
+            padding: 0 22px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            color: #172554;
+            font-size: 30px;
+            margin-bottom: 9px;
+        }
+
+        .heading p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        /* History Card */
+        .history-card {
+            background: white;
+            padding: 28px;
+            border-radius: 13px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+        }
+
+        .section-heading {
+            color: #172554;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .section-description {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        /* Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1150px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .id {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .candidate {
+            color: #172554;
+            font-weight: 600;
+        }
+
+        .job {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .match {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .similarity {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .matched-skills {
+            color: #15803d;
+            max-width: 170px;
+            overflow-wrap: anywhere;
+        }
+
+        .missing-skills {
+            color: #dc2626;
+            max-width: 170px;
+            overflow-wrap: anywhere;
+        }
+
+        .resume-name {
+            max-width: 150px;
+            overflow-wrap: anywhere;
+        }
+
+        /* Empty and Error */
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .error {
+            padding: 18px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #dc2626;
+            border-radius: 8px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 30px 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .navbar {
+                justify-content: center;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .container {
+                margin-top: 25px;
+                padding: 0 14px;
+            }
+
+            .heading h1 {
+                font-size: 25px;
+            }
+
+            .history-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            AI <span>Resume Analyzer</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/history/" class="active">Analysis History</a>
+            <a href="/dashboard/">Dashboard</a>
+        </div>
+
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <div class="heading">
+            <h1>Analysis History</h1>
+            <p>View and review previously analyzed candidate resumes.</p>
+        </div>
+
+        <div class="history-card">
+
+            <h2 class="section-heading">Resume Analysis Records</h2>
+
+            <p class="section-description">
+                All previously saved resume matching results.
+            </p>
+
+            {% if error %}
+
+                <p class="error">{{ error }}</p>
+
+            {% else %}
+
+                {% if records %}
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Analysis ID</th>
+                                    <th>Candidate</th>
+                                    <th>Job Title</th>
+                                    <th>Resume</th>
+                                    <th>Match Score</th>
+                                    <th>Similarity Score</th>
+                                    <th>Matched Skills</th>
+                                    <th>Missing Skills</th>
+                                    <th>Analysis Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for record in records %}
+
+                                    <tr>
+                                        <td class="id">{{ record.0 }}</td>
+
+                                        <td class="candidate">{{ record.1 }}</td>
+
+                                        <td class="job">
+                                            {{ record.2|default:"Unknown" }}
+                                        </td>
+
+                                        <td class="resume-name">
+                                            {{ record.3 }}
+                                        </td>
+
+                                        <td class="match">{{ record.4 }}%</td>
+
+                                        <td class="similarity">{{ record.5 }}%</td>
+
+                                        <td class="matched-skills">
+                                            {{ record.6|default:"None" }}
+                                        </td>
+
+                                        <td class="missing-skills">
+                                            {{ record.7|default:"None" }}
+                                        </td>
+
+                                        <td>
+                                            {{ record.8|date:"d-m-Y H:i" }}
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <p class="empty">
+                        No resume analysis records found.
+                    </p>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <footer>
+        AI Resume Analyzer and Job Matcher | Built with Python, Django and Machine Learning
+    </footer>
+
+</body>
+</html>
