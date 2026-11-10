@@ -1,188 +1,284 @@
 # AI Resume Analyzer and Job Matcher
 
-A Django-based web application that analyzes a candidate's PDF resume
-against a selected job description. It compares required skills,
-calculates a text-similarity score, and stores analysis results in
-MySQL.
+A Django-based web application that analyzes PDF resumes against selected job descriptions using **Python, MySQL, TF-IDF, and Cosine Similarity**.
+
+The application extracts resume text, identifies matched and missing skills, calculates matching scores, and stores analysis results for future reference.
 
 ## Project Overview
 
-Recruiters and job seekers often need to compare a resume with a job
-description. This project provides a simple way to: - Upload a resume in
-PDF format. - Select a job from the available job descriptions. -
-Extract text from the uploaded PDF. - Compare resume skills with the
-job's required skills. - Calculate text similarity using TF-IDF and
-cosine similarity. - Save and review analysis results. - View summary
-metrics on a dashboard.
+Recruiters and job seekers often need to compare resumes with job requirements. This project simplifies that process by providing an application that analyzes resumes and displays matching results.
+
+### Key Features
+
+- Upload resumes in PDF format.
+- Select job descriptions from available jobs.
+- Extract text from PDF resumes.
+- Compare resume skills with required job skills.
+- Calculate text similarity using TF-IDF and Cosine Similarity.
+- Display matched and missing skills.
+- Save analysis results in MySQL.
+- View previous analyses through an Analysis History page.
+- Monitor results through a Dashboard.
 
 ## Technologies Used
 
--   **Python** -- application logic
--   **Django** -- web framework
--   **HTML and CSS** -- user interface
--   **MySQL** -- job descriptions and analysis records
--   **mysql-connector-python** -- Python connection to MySQL
--   **pypdf** -- PDF text extraction
--   **scikit-learn** -- TF-IDF and cosine similarity
+| Technology | Purpose |
+|---|---|
+| Python | Application logic |
+| Django | Web framework |
+| HTML5 | Page structure |
+| CSS3 | User interface and styling |
+| MySQL | Store job descriptions and analysis results |
+| mysql-connector-python | Python–MySQL connectivity |
+| pypdf | Extract text from PDF resumes |
+| scikit-learn | TF-IDF and Cosine Similarity |
 
-> Django's own internal tables may use SQLite in this setup. The
-> project-specific `job_descriptions` and `resume_analyses` tables are
-> accessed directly through MySQL Connector.
+**Database note:** The project-specific tables are accessed using MySQL Connector. Django's internal tables may use SQLite in the current development setup.
 
-## Main Features
+## Application Pages
 
-1.  **Resume upload:** Upload a candidate's PDF resume.
-2.  **Job selection:** Choose a job description from the jobs stored in
-    the database.
-3.  **Skill matching:** Compare the job's required skills with the
-    extracted resume text.
-4.  **Text similarity:** Use TF-IDF vectorization and cosine similarity
-    to estimate how similar the resume and job description text are.
-5.  **Analysis history:** View previous resume analyses.
-6.  **Dashboard:** View the number of resumes analyzed, available jobs,
-    average match score, highest match score, and recent analyses.
+### 1. Home Page
+- Enter candidate details.
+- Select a job description.
+- Upload a PDF resume.
+- View skill matching and text similarity results.
 
-## How the Analysis Works
+### 2. Analysis History
+- View previously analyzed resumes.
+- Check candidate names and job titles.
+- Review matching scores and missing skills.
 
-### 1. PDF text extraction
+### 3. Dashboard
+- View total resumes analyzed.
+- View available job descriptions.
+- Monitor average match score.
+- View highest match score.
+- Review recent analyses.
 
-The application reads the uploaded PDF using `pypdf` and extracts its
-text.
+## How the Application Works
 
-### 2. Required-skill comparison
+The application follows these steps:
 
-The required skills are read from the selected job record and compared
-with the extracted resume text. The application displays matched and
-missing skills.
+1. The user enters the candidate name.
+2. The user selects a job description.
+3. The user uploads a PDF resume.
+4. The application extracts resume text using `pypdf`.
+5. Required skills are compared with the extracted resume text.
+6. Matched and missing skills are identified.
+7. TF-IDF converts the resume and job description text into numerical vectors.
+8. Cosine Similarity calculates the text similarity score.
+9. The analysis results are saved in MySQL.
+10. The user can view results in the application and analysis history.
 
-The skill match score is calculated as:
+## Matching Methodology
 
-`Skill Match Score = (Number of Matched Skills / Total Required Skills) × 100`
+### 1. Skill Matching
 
-### 3. Text similarity
+The application compares the required skills from the selected job with the extracted resume text.
 
-The application combines the resume text and job description, converts
-them into TF-IDF vectors using `TfidfVectorizer`, and calculates cosine
-similarity.
+The skill match percentage is calculated using:
 
-The similarity score is displayed as a percentage.
+**Skill Match Score = (Matched Skills / Total Required Skills) × 100**
 
-> These scores are simple matching indicators, not a hiring decision.
-> The current skill comparison uses text matching and may not understand
-> context, synonyms, or whether a skill is used at a beginner or
-> advanced level.
+The application displays:
+- Matched skills
+- Missing skills
+- Skill match percentage
 
-## Database
+### 2. Text Similarity Using TF-IDF
 
-Database name: `ai_resume_matcher`
+TF-IDF stands for Term Frequency–Inverse Document Frequency.
 
-### `job_descriptions`
+It converts text into numerical representations based on the importance of words in the documents.
 
-Stores job details, including: - `job_id` - `job_title` -
-`company_name` - `description` - `required_skills`
+### 3. Cosine Similarity
 
-### `resume_analyses`
+Cosine Similarity measures the similarity between two numerical vectors.
 
-Stores analysis results, including: - `analysis_id` - `candidate_name` -
-`job_id` - `resume_filename` - `match_score` - `matched_skills` -
-`missing_skills` - `created_at` - `similarity_score`
+The application uses it to calculate a text similarity percentage between the resume and job description.
 
-The analysis history joins these tables using `job_id` to display the
-relevant job title.
+**Note:** Skill matching currently uses text-based matching. It may not recognize synonyms, understand context, or evaluate proficiency. Similarity and skill scores are indicators, not hiring decisions.
+
+## Database Design
+
+**Database Name:** `ai_resume_matcher`
+
+### Table 1: `job_descriptions`
+
+Stores available job descriptions.
+
+| Column | Description |
+|---|---|
+| job_id | Job identifier |
+| job_title | Job title |
+| company_name | Company name |
+| description | Job description |
+| required_skills | Skills required for the job |
+
+### Table 2: `resume_analyses`
+
+Stores resume analysis results.
+
+| Column | Description |
+|---|---|
+| analysis_id | Analysis identifier |
+| candidate_name | Candidate name |
+| job_id | Related job identifier |
+| resume_filename | Uploaded resume filename |
+| match_score | Skill match percentage |
+| matched_skills | Skills found in the resume |
+| missing_skills | Skills missing from the resume |
+| created_at | Analysis date and time |
+| similarity_score | Text similarity percentage |
+
+The Analysis History page uses a SQL JOIN on `job_id` to retrieve the corresponding job title.
 
 ## Project Structure
 
-``` text
+```text
 ai_resume_matcher/
-├── manage.py
+│
 ├── config/
-│   └── urls.py
-└── resume_analyzer/
-    ├── views.py
-    └── templates/
-        └── resume_analyzer/
-            ├── home.html
-            ├── history.html
-            └── dashboard.html
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── resume_analyzer/
+│   ├── migrations/
+│   ├── templates/
+│   │   └── resume_analyzer/
+│   │       ├── home.html
+│   │       ├── history.html
+│   │       └── dashboard.html
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+│
+├── analysis_history.py
+├── main.py
+├── manage.py
+├── pdf_reader.py
+├── similarity.py
+├── README.md
+└── .gitignore
 ```
 
-Other project files and folders may be present depending on your local
-setup.
+## Installation and Setup
 
-## Setup and Run
+Follow these instructions to run the project locally on Windows.
 
-### 1. Open the project folder
+### Step 1: Clone the Repository
 
-In PowerShell:
-
-``` powershell
-cd C:\Users\dsuma\OneDrive\Desktop\ai_resume_matcher
+```bash
+git clone https://github.com/DSUMITHRA/ai-resume-analyzer-job-matcher.git
 ```
 
-### 2. Install dependencies
+Navigate into the project folder:
 
-``` powershell
+```bash
+cd ai-resume-analyzer-job-matcher
+```
+
+### Step 2: Install Dependencies
+
+```bash
 python -m pip install django mysql-connector-python pypdf scikit-learn
 ```
 
-### 3. Configure the MySQL password
+### Step 3: Configure Environment Variables
 
-Set the password in the terminal without placing it directly in the
-source code:
+In PowerShell, set the MySQL password:
 
-``` powershell
-$env:MYSQL_PASSWORD="YOUR_MYSQL_PASSWORD"
+```powershell
+$env:MYSQL_PASSWORD = "YOUR_MYSQL_PASSWORD"
 ```
 
-Replace the placeholder with your MySQL password. Set this variable
-again when opening a new terminal.
+Generate a Django secret key for the current terminal session:
 
-### 4. Prepare the MySQL database
+```powershell
+$env:DJANGO_SECRET_KEY = python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
 
-Create the `ai_resume_matcher` database and the `job_descriptions` and
-`resume_analyses` tables using the schema used by the project. Add job
-descriptions to `job_descriptions` before testing resume analysis.
+Do not store actual passwords or secret keys in source code or GitHub.
 
-### 5. Check the Django project
+These environment variables need to be configured again when opening a new terminal.
 
-``` powershell
+### Step 4: Configure MySQL
+
+1. Open MySQL Workbench.
+2. Create the database:
+
+```sql
+CREATE DATABASE ai_resume_matcher;
+```
+
+3. Create the `job_descriptions` and `resume_analyses` tables using the project database schema.
+4. Insert job descriptions into the `job_descriptions` table.
+
+The application requires job records to be available before resume analysis.
+
+### Step 5: Check the Django Project
+
+```bash
 python manage.py check
 ```
 
-### 6. Start the development server
+### Step 6: Start the Development Server
 
-``` powershell
+```bash
 python manage.py runserver
 ```
 
-Open these pages in your browser:
+Open the application in your browser:
 
--   Home: http://127.0.0.1:8000/
--   Analysis history: http://127.0.0.1:8000/history/
--   Dashboard: http://127.0.0.1:8000/dashboard/
+- **Home:** http://127.0.0.1:8000/
+- **Analysis History:** http://127.0.0.1:8000/history/
+- **Dashboard:** http://127.0.0.1:8000/dashboard/
 
-Stop the development server with `Ctrl + C`.
-
-## Current Project Status
-
-The current working version includes PDF upload and text extraction, job
-selection, skill matching, TF-IDF similarity calculation, saving results
-to MySQL, an analysis history page, and a dashboard.
+Stop the server using `Ctrl + C`.
 
 ## Future Enhancements
 
--   Improve skill matching with synonyms and context-aware methods.
--   Add stronger validation for uploaded files and empty or unreadable
-    PDFs.
--   Add user authentication and role-based access.
--   Add charts and filters to the dashboard.
--   Support more resume formats.
--   Add automated tests and deployment configuration.
+- Improve skill matching using synonyms and contextual understanding.
+- Implement advanced NLP-based resume analysis.
+- Support DOCX and additional resume formats.
+- Add user authentication and role-based access.
+- Add charts, filters, and advanced dashboard analytics.
+- Improve automated testing.
+- Deploy the application to a cloud platform.
+
+## Learning Outcomes
+
+Through this project, I gained practical experience in:
+
+- Python application development.
+- Django web application development.
+- MySQL database connectivity.
+- SQL queries and JOIN operations.
+- PDF text extraction.
+- Text preprocessing and skill matching.
+- TF-IDF vectorization.
+- Cosine Similarity.
+- Building a complete application with frontend, backend, and database integration.
 
 ## Important Notes
 
--   Do not commit passwords, API keys, or other secrets to GitHub.
--   This is an educational project and its scores should not be used as
-    the sole basis for recruitment decisions.
--   The Django development server is intended for local development, not
-    production hosting.
+- This is an educational project.
+- The application is intended for local development using Django's development server.
+- The matching scores should not be treated as the sole basis for recruitment decisions.
+- Never upload personal resumes, passwords, secret keys, or confidential information to GitHub.
+
+## Author
+
+**Sumithra**
+
+GitHub: https://github.com/DSUMITHRA
+
+---
+
+If you find this project useful, feel free to explore the repository and its implementation.
