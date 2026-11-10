@@ -38,6 +38,7 @@ Recruiters and job seekers often need to compare resumes with job requirements. 
 ## Application Pages
 
 ### 1. Home Page
+![Home Page](screenshots/home.png)
 - Enter candidate details.
 - Select a job description.
 - Upload a PDF resume.
